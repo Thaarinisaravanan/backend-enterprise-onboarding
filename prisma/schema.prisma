@@ -1,0 +1,122 @@
+// This is your Prisma schema file.
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ──────────────────────────────────────────────
+// Enums
+// ──────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  MANAGER
+  VIEWER
+}
+
+enum ItemStatus {
+  IN_STOCK
+  LOW_STOCK
+  OUT_OF_STOCK
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN_SUCCESS
+  LOGIN_FAILURE
+  ROLE_CHANGE
+  PASSWORD_CHANGE
+  INVENTORY_ADJUSTMENT
+}
+
+// ──────────────────────────────────────────────
+// Models
+// ──────────────────────────────────────────────
+
+model Company {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users     User[]
+  items     Item[]
+  auditLogs AuditLog[]
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String
+  password  String
+  firstName String
+  lastName  String
+  role      Role     @default(VIEWER)
+  companyId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  company   Company  @relation(fields: [companyId], references: [id])
+  auditLogs AuditLog[]
+
+  @@unique([email, companyId])
+  @@index([companyId])
+  @@index([email])
+}
+
+model Item {
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  sku         String
+  quantity    Int        @default(0)
+  status      ItemStatus @default(OUT_OF_STOCK)
+  category    String?
+  threshold   Int        @default(10)
+  companyId   String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?
+
+  company     Company    @relation(fields: [companyId], references: [id])
+
+  @@unique([sku, companyId])
+  @@index([companyId])
+  @@index([status])
+  @@index([category])
+  @@index([companyId, status])
+  @@index([companyId, deletedAt])
+}
+
+model AuditLog {
+  id          String      @id @default(uuid())
+  userId      String?
+  companyId   String
+  entityType  String
+  entityId    String?
+  action      AuditAction
+  before      Json?
+  after       Json?
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  requestId   String?
+  createdAt   DateTime    @default(now())
+
+  company     Company     @relation(fields: [companyId], references: [id])
+  user        User?       @relation(fields: [userId], references: [id])
+
+  @@index([companyId])
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([createdAt])
+}

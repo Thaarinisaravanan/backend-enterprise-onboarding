@@ -1,0 +1,25 @@
+# CODEOWNERS — automatically requests review from owners on PR changes
+# Syntax: <pattern> <GitHub username or team>
+# Replace @your-team with your actual GitHub team or username
+
+# Global fallback — all files
+*                           @your-org/backend-team
+
+# Auth — security-critical
+src/auth/                   @your-org/backend-leads
+src/common/guards/          @your-org/backend-leads
+
+# Items — core business domain
+src/items/                  @your-org/backend-team
+
+# Infrastructure — prisma, redis, jobs
+src/prisma/                 @your-org/backend-leads
+src/redis/                  @your-org/backend-team
+src/jobs/                   @your-org/backend-team
+
+# CI/CD — requires lead review
+.github/                    @your-org/backend-leads
+
+# Docker & compose
+Dockerfile                  @your-org/backend-leads
+docker-compose*.yml         @your-org/backend-leads

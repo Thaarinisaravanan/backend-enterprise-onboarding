@@ -1,0 +1,32 @@
+version: '3.9'
+
+# Test environment — isolated DB and Redis, no app service.
+# Used by integration and e2e tests.
+# Usage: docker compose -f docker-compose.test.yml up -d
+
+services:
+  postgres-test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: enterprise_onboarding_test
+    ports:
+      - '5433:5432'
+    tmpfs:
+      - /var/lib/postgresql/data   # in-memory — resets on every run
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis-test:
+    image: redis:7-alpine
+    ports:
+      - '6380:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
