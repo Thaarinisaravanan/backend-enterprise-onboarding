@@ -1,7 +1,16 @@
+packages:
+  - "."
+
 allowBuilds:
-  '@nestjs/core': true
-  '@prisma/client': true
-  '@prisma/engines': true
-  bcrypt: true
-  msgpackr-extract: true
-  prisma: true
+  '0': '@nestjs/core'
+  '1': '@prisma/client'
+  '2': '@prisma/engines'
+  '3': bcrypt
+  '4': msgpackr-extract
+  '5': prisma
+  '@nestjs/core': set this to true or false
+  '@prisma/client': set this to true or false
+  '@prisma/engines': set this to true or false
+  bcrypt: set this to true or false
+  msgpackr-extract: set this to true or false
+  prisma: set this to true or false
